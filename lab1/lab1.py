@@ -13,18 +13,13 @@ except IOError:
     print 'Cannot open file!!!'
     products = Products()
     orders = Orders()
+    data = {}
 else:
     print 'Data has been loaded'
     data = pickle.load(f)
     products = Products(data['products'], data['plast'])
     orders = Orders(data['orders'])
     f.close()
-finally:
-    data = {
-        'products': products.get_products,
-        'orders': orders.get_orders,
-        'plast': products.get_last
-    }
 
 
 def select_menu():
@@ -49,7 +44,27 @@ def select_menu():
 
 
 def delete_menu():
-    pass
+    print "\n1. 'products'\n2. 'orders'\n3. Back"
+    while True:
+        key = raw_input("Select table: ")
+        if key == '1':
+            while True:
+                try:
+                    pid = int(raw_input("Enter pid: "))
+                except ValueError:
+                    print "Wrong Answer. Please Try Again!"
+                else:
+                    if not products.exists(pid):
+                        print "Product with pid={} doesn't exist!".format(pid)
+                    else:
+                        products.delete(pid, orders)
+                    return
+        elif key == '2':
+
+            return
+        elif key == '3':
+            return
+        print "Wrong Answer. Please Try Again!"
 
 
 def insert_menu():
@@ -64,7 +79,7 @@ def insert_menu():
                 except ValueError:
                     print "Wrong Answer. Please Try Again!"
                 else:
-                    products.add(Product(products.get_last, name, price))
+                    products.add(Product(products.last, name, price))
                     return
         elif key == '2':
             while True:
@@ -91,21 +106,37 @@ def insert_menu():
 
 
 def update_menu():
-    pass
+    print "\n1. 'products'\n2. 'orders'\n3. Back"
+    while True:
+        key = raw_input("Select table: ")
+        # if key == '1':
+        #     return
+        # elif key == '2':
+        #     return
+        # elif key == '3':
+        #     return
+        # print "Wrong Answer. Please Try Again!"
 
 
 def filter_menu():
-    pass
+    for pid in orders.pids():
+        if products[pid].price > 100:
+            print products[pid]
 
 
 actions = {'1': select_menu, '2': delete_menu, '3': insert_menu, '4': update_menu, '5': filter_menu}
 
 while True:
-    print "\n1. SELECT * FROM\n2. DELETE \'item\' FROM\n3. INSERT INTO\n4. UPDATE\n5. Filter\n6. Exit"
+    print "\n1. SELECT * FROM\n2. DELETE \'item\' FROM\n3. INSERT INTO\n4. UPDATE\n5. Filter\n6. Save and Exit"
     key = raw_input("Select action: ")
     if key in actions:
         actions[key]()
     elif key == '6':
+        data = {
+            'products': products.products,
+            'orders': orders.orders,
+            'plast': products.last
+        }
         with open('data.pkl', 'wb') as f:
             pickle.dump(data, f)
             f.close()

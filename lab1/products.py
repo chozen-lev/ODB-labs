@@ -1,48 +1,43 @@
 class Products(object):
     def __init__(self, products=[], last=0):
-        self.products = products
-        self.last = last
+        self._products = products
+        self._last = last
 
     def __getitem__(self, pid):
-        for product in self.products:
+        for product in self._products:
             if product.pid == pid:
                 return product
         raise Exception("Product with pid={} doesn't exist!".format(pid))
 
-    def __len__(self):
-        return len(self.products)
-
     def __str__(self):
-        return "\n".join(str(product) for product in self.products)
+        return "\n".join(str(product) for product in self._products)
 
     def add(self, product):
-        self.products.append(product)
-        self.last += 1
+        self._products.append(product)
+        self._last += 1
 
     def delete(self, pid, orders):
-        for order in orders:
-            if order.pid == pid:
-                orders.delete(order.oid)
-        for index, product in enumerate(self.products):
+        orders.delete_by_pid(pid)
+        for index, product in enumerate(self._products):
             if product.pid == pid:
-                self.products.pop(index)
+                self._products.pop(index)
                 del product
                 return
         raise Exception("Product with pid={} doesn't exist!".format(pid))
 
     def exists(self, pid):
-        for product in self.products:
+        for product in self._products:
             if pid == product.pid:
                 return True
         return False
 
     def empty(self):
-        return not self.products
+        return not self._products
 
     @property
-    def get_products(self):
-        return self.products
+    def products(self):
+        return self._products
 
     @property
-    def get_last(self):
-        return self.last
+    def last(self):
+        return self._last
