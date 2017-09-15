@@ -15,11 +15,14 @@ except IOError:
     orders = Orders()
     data = {}
 else:
-    print 'Data has been loaded'
     data = pickle.load(f)
     products = Products(data['products'], data['plast'])
     orders = Orders(data['orders'])
     f.close()
+    if not products.empty():
+        print 'Data has been loaded'
+    else:
+        print 'File has been found, but it has any data'
 
 
 def select_menu():
@@ -40,19 +43,19 @@ def select_menu():
             return
         elif key == '3':
             return
-        print "Wrong Answer. Please Try Again!"
+        print 'Wrong Answer. Please Try Again!'
 
 
 def delete_menu():
     print "\n1. 'products'\n2. 'orders'\n3. Back"
     while True:
-        key = raw_input("Select table: ")
+        key = raw_input('Select table: ')
         if key == '1':
             while True:
                 try:
-                    pid = int(raw_input("Enter pid: "))
+                    pid = int(raw_input('Enter pid: '))
                 except ValueError:
-                    print "Wrong Answer. Please Try Again!"
+                    print 'Wrong Answer. Please Try Again!'
                 else:
                     if not products.exists(pid):
                         print "Product with pid={} doesn't exist!".format(pid)
@@ -60,11 +63,11 @@ def delete_menu():
                         products.delete(pid, orders)
                     return
         elif key == '2':
-
+            # TODO: not forget to do
             return
         elif key == '3':
             return
-        print "Wrong Answer. Please Try Again!"
+        print 'Wrong Answer. Please Try Again!'
 
 
 def insert_menu():
@@ -72,28 +75,28 @@ def insert_menu():
     while True:
         key = raw_input("Select table: ")
         if key == '1':
-            name = raw_input("Enter product name: ")
+            name = raw_input('Enter product name: ')
             while True:
                 try:
-                    price = int(raw_input("Enter product price: "))
+                    price = int(raw_input('Enter product price: '))
                 except ValueError:
-                    print "Wrong Answer. Please Try Again!"
+                    print 'Wrong Answer. Please Try Again!'
                 else:
                     products.add(Product(products.last, name, price))
                     return
         elif key == '2':
             while True:
                 try:
-                    oid = int(raw_input("Enter oid: "))
+                    oid = int(raw_input('Enter oid: '))
                 except ValueError:
-                    print "Wrong Answer. Please Try Again!"
+                    print 'Wrong Answer. Please Try Again!'
                 else:
                     break
             while True:
                 try:
                     pid = int(raw_input("Enter pid: "))
                 except ValueError:
-                    print "Wrong Answer. Please Try Again!"
+                    print 'Wrong Answer. Please Try Again!'
                 else:
                     if not products.exists(pid):
                         print "Product with pid={} doesn't exist!".format(pid)
@@ -102,45 +105,63 @@ def insert_menu():
                     return
         elif key == '3':
             return
-        print "Wrong Answer. Please Try Again!"
+        print 'Wrong Answer. Please Try Again!'
 
 
 def update_menu():
-    print "\n1. 'products'\n2. 'orders'\n3. Back"
     while True:
-        key = raw_input("Select table: ")
-        # if key == '1':
-        #     return
-        # elif key == '2':
-        #     return
-        # elif key == '3':
-        #     return
-        # print "Wrong Answer. Please Try Again!"
+        try:
+            pid = int(raw_input('Enter pid: '))
+        except ValueError:
+            print 'Wrong Answer. Please Try Again!'
+        else:
+            if not products.exists(pid):
+                print "Product with pid={} doesn't exist!".format(pid)
+            else:
+                name = raw_input('Enter new name: ')
+                products[pid].name = name
+                while True:
+                    try:
+                        price = int(raw_input('Enter new price: '))
+                    except ValueError:
+                        print 'Wrong Answer. Please Try Again!'
+                    else:
+                        products[pid].price = price
+                        break
+            return
 
 
 def filter_menu():
-    for pid in orders.pids():
+    index = -1
+    for index, pid in enumerate(orders.pids()):
         if products[pid].price > 100:
+            index = pid
             print products[pid]
+    if index == -1:
+        print 'there is any ordered products with price more then 100 UAH'
 
 
 actions = {'1': select_menu, '2': delete_menu, '3': insert_menu, '4': update_menu, '5': filter_menu}
 
 while True:
-    print "\n1. SELECT * FROM\n2. DELETE \'item\' FROM\n3. INSERT INTO\n4. UPDATE\n5. Filter\n6. Save and Exit"
-    key = raw_input("Select action: ")
-    if key in actions:
-        actions[key]()
-    elif key == '6':
-        data = {
-            'products': products.products,
-            'orders': orders.orders,
-            'plast': products.last
-        }
-        with open('data.pkl', 'wb') as f:
-            pickle.dump(data, f)
-            f.close()
-        print "Data has been saved"
+    print "\n1. SELECT * FROM\n2. DELETE \'item\' FROM\n3. INSERT INTO\n4. UPDATE 'products'\n5. Filter\n6. Save&Exit"
+    try:
+        key = raw_input('Select action: ')
+    except KeyboardInterrupt:
         break
     else:
-        print "Wrong Answer. Please Try Again!"
+        if key in actions:
+            actions[key]()
+        elif key == '6':
+            data = {
+                'products': products.products,
+                'orders': orders.orders,
+                'plast': products.last
+            }
+            with open('data.pkl', 'wb') as f:
+                pickle.dump(data, f)
+                f.close()
+            print 'Data has been saved'
+            break
+        else:
+            print 'Wrong Answer. Please Try Again!'
