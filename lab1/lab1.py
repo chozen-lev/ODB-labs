@@ -63,7 +63,17 @@ def delete_menu():
                         products.delete(pid, orders)
                     return
         elif key == '2':
-            # TODO: not forget to do
+            while True:
+                try:
+                    oid = int(raw_input('Enter oid: '))
+                except ValueError:
+                    print 'Wrong Answer. Please Try Again!'
+                else:
+                    if not orders.exists(oid):
+                        print "Order with oid={} doesn't exist!".format(oid)
+                    else:
+                        orders.delete(oid)
+                    return
             return
         elif key == '3':
             return
@@ -132,13 +142,16 @@ def update_menu():
 
 
 def filter_menu():
-    index = -1
-    for index, pid in enumerate(orders.pids()):
-        if products[pid].price > 100:
-            index = pid
-            print products[pid]
-    if index == -1:
-        print 'there is any ordered products with price more then 100 UAH'
+    prices = {}
+    for order in orders.orders:
+        if order.oid in prices:
+            prices[order.oid] += products[order.pid].price
+        else:
+            prices[order.oid] = products[order.pid].price
+
+    for oid in prices:
+        if prices[oid] > 100:
+            print "%d. %d" % (oid, prices[oid])
 
 
 actions = {'1': select_menu, '2': delete_menu, '3': insert_menu, '4': update_menu, '5': filter_menu}

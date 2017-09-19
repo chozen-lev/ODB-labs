@@ -13,10 +13,13 @@ class Orders(object):
 
     def delete(self, oid):
         i = -1
-        for index, order in enumerate(self._orders):
-            if order.oid == oid:
-                self._orders.pop(index)
+        index = 0
+        while index < len(self._orders):
+            if self._orders[index].oid == oid:
+                del self._orders[index]
                 i = index
+                continue
+            index += 1
         if i == -1:
             raise Exception("Order with oid={} doesn't exist!".format(oid))
 
