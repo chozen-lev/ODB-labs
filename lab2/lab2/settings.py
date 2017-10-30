@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'movies.apps.MoviesConfig',
+    'bootstrap4',
+    'django_tables2',
 ]
 
 MIDDLEWARE = [
